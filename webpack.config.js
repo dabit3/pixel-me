@@ -37,13 +37,18 @@ module.exports = {
         ]
       },
       {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      },
+      {
         test: /\.(ttf|eot|svg|woff(2)?)(\?v=[\d.]+)?(\?[a-z0-9#-]+)?$/,
         loader: 'url-loader?limit=100000&name=./css/[hash].[ext]'
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['*', '.mjs', '.js', '.jsx', '.json', '.gql', '.graphql']
   },
   devServer: {
     contentBase: './build'

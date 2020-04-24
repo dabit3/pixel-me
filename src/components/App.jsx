@@ -21,8 +21,15 @@ import SimpleSpinnerContainer from './SimpleSpinner';
 import UndoRedoContainer from './UndoRedo';
 import initialSetup from '../utils/startup';
 import drawHandlersProvider from '../utils/drawHandlersProvider';
+import { withRouter } from 'react-router';
+import { v4 as uuid } from 'uuid';
+import { createDrawing } from '../graphql/mutations';
 
-export default class App extends React.Component {
+import { API } from 'aws-amplify';
+
+const CLIENT_ID = uuid();
+
+class App extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -34,9 +41,38 @@ export default class App extends React.Component {
     Object.assign(this, drawHandlersProvider(this));
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { dispatch } = this.props;
-    initialSetup(dispatch, localStorage);
+    initialSetup(dispatch);
+
+    try {
+      const { id } = this.props.match.params;
+      console.log('id: ', id);
+      const drawingData = JSON.stringify(
+        this.props.store.getState().present.toJS()
+      );
+      const drawing = {
+        id,
+        name: 'Hello World',
+        clientId: uuid(),
+        itemType: 'Drawing',
+        data: drawingData
+      };
+      console.log('drawing: ', drawing);
+      await API.graphql({
+        query: createDrawing,
+        variables: { input: drawing }
+      });
+      console.log('item created!');
+    } catch (err) {}
+
+    console.log('state: ', this.props.store.getState());
+    console.log('present: ', this.props.store.getState().present.toJS());
+  }
+
+  componentWillUpdate() {
+    const currentState = this.props.store.getState().present.toJS();
+    console.log('currentState: ', currentState);
   }
 
   changeModalType(type) {
@@ -292,3 +328,5 @@ export default class App extends React.Component {
     );
   }
 }
+
+export default withRouter(App);

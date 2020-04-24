@@ -1,0 +1,9 @@
+type Drawing @model @key(name: "byItemType", fields: ["itemType", "createdAt"], queryField: "itemsByType") {
+  id: ID!
+  clientId: ID!
+  name: String!
+  data: String
+  public: Boolean
+  itemType: String
+  createdAt: String
+}

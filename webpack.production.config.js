@@ -32,6 +32,11 @@ const config = {
         loader: 'babel-loader'
       },
       {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      },
+      {
         test:   /\.css$/i,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
@@ -53,10 +58,10 @@ const config = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['*', '.mjs', '.js', '.jsx', '.json', '.gql', '.graphql']
   },
   output: {
-    path: path.join(__dirname, '/deploy'),
+    path: path.join(__dirname, '/build'),
     publicPath: '/',
     filename: 'bundle.js'
   }

@@ -78,6 +78,7 @@ function partialReducer(state, action) {
     case types.SET_DURATION:
       return setDuration(state, action.duration);
     case types.NEW_PROJECT:
+      console.log('initialstate: ', setInitialState(state).toJS());
       return setInitialState(state);
     case types.UPDATE_GRID_BOUNDARIES:
       return updateGridBoundaries(state, action);

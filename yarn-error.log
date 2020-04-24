@@ -1,0 +1,134 @@
+Arguments: 
+  /Users/dabit/.nvm/versions/node/v12.13.1/bin/node /usr/local/Cellar/yarn/1.22.4/libexec/bin/yarn.js add @babel-core @babel/preset-env @babel/preset-react @babel/register @babel/runtime-corejs2 babel-core babel-eslint babel-jest babel-loader babel-plugin-react-transform copy-webpack-plugin extract-text-webpack-plugin html-webpack-plugin webpack webpack-cli webpack-dev-middleware webpack-dev-server webpack-hot-middleware -D
+
+PATH: 
+  /Users/dabit/.nvm/versions/node/v12.13.1/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/usr/local/bin:/usr/local/bin:/usr/local/bin:/Users/dabit/Library/Android/sdk/tools:/Users/dabit/Library/Android/sdk/platform-tools:/usr/local/opt/fzf/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  12.13.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@babel-core: Request "https://registry.yarnpkg.com/@babel-core" returned a 405
+      at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:66996:18)
+      at Request.self.callback (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:140748:22)
+      at Request.emit (events.js:210:5)
+      at Request.<anonymous> (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:141720:10)
+      at Request.emit (events.js:210:5)
+      at IncomingMessage.<anonymous> (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:141642:12)
+      at Object.onceWrapper (events.js:299:28)
+      at IncomingMessage.emit (events.js:215:7)
+      at endReadableNT (_stream_readable.js:1184:12)
+      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+
+npm manifest: 
+  {
+    "name": "pixel-art-react",
+    "version": "3.7.1",
+    "description": "Draw and animate Pixel Art, then export the results to CSS or download them, powered by React",
+    "author": "Javier Valencia Romero",
+    "scripts": {
+      "lint": "eslint **/*.{js,jsx}",
+      "csslint": "stylelint src/**/*.{css,js,jsx}",
+      "prettier": "prettier **/*.{js,jsx,json,yml,yaml,css,md}",
+      "format": "npm run prettier -- --write --list-different",
+      "test": "jest",
+      "test:watch": "npm run test -- --watch",
+      "validate": "npm run lint && npm run csslint && npm run prettier -- --list-different && npm run test",
+      "development": "webpack-dev-server --hot",
+      "deploy": "NODE_ENV=production webpack -p --config webpack.production.config.js",
+      "server": "node ./src/server/loader",
+      "server-debug": "node --inspect ./src/server/loader",
+      "start": "npm run server",
+      "postinstall": "NODE_ENV=production webpack -p --config webpack.production.config.js"
+    },
+    "main": "index.js",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/jvalen/pixel-art-react"
+    },
+    "keywords": [
+      "pixel",
+      "art",
+      "drawing",
+      "react",
+      "redux",
+      "express"
+    ],
+    "license": "MIT",
+    "dependencies": {
+      "autoprefixer": "^9.7.2",
+      "blob-stream": "^0.1.3",
+      "body-parser": "^1.19.0",
+      "box-shadow-pixels": "0.0.4",
+      "canvas-toBlob": "^1.0.0",
+      "cookie-parser": "^1.4.4",
+      "css-loader": "^3.2.0",
+      "express": "^4.17.1",
+      "express-session": "^1.16.2",
+      "file-loader": "^1.1.11",
+      "file-saver": "^2.0.2",
+      "gif-encoder": "^0.7.2",
+      "gm": "^1.23.1",
+      "immutable": "^3.8.2",
+      "lost": "^8.3.1",
+      "oauth": "^0.9.15",
+      "postcss-import": "^12.0.1",
+      "postcss-loader": "^3.0.0",
+      "postcss-reporter": "^6.0.1",
+      "precss": "^2.0.0",
+      "pug": "^2.0.4",
+      "radium": "^0.26.0",
+      "react": "^16.8.6",
+      "react-addons-pure-render-mixin": "^15.6.2",
+      "react-addons-shallow-compare": "^15.6.2",
+      "react-beautiful-dnd": "^12.1.1",
+      "react-color": "^2.17.3",
+      "react-cookie-banner": "3.0.0",
+      "react-custom-scrollbars": "^4.2.1",
+      "react-dom": "^16.8.6",
+      "react-modal": "^3.9.1",
+      "react-redux": "^7.1.0",
+      "react-transform-hmr": "^1.0.4",
+      "react-transition-group": "^2.3.1",
+      "redux": "^4.0.4",
+      "redux-undo": "^1.0.0-beta9",
+      "shortid": "^2.2.14",
+      "style-loader": "^0.23.1",
+      "temp": "^0.9.0",
+      "twitter": "^1.7.1",
+      "url-loader": "^2.0.1",
+      "whatwg-fetch": "^2.0.4"
+    },
+    "engines": {
+      "node": "12.13.1",
+      "npm": "6.12.1"
+    },
+    "devDependencies": {
+      "eslint": "^6.0.1",
+      "eslint-config-airbnb": "^18.0.1",
+      "eslint-config-prettier": "^6.7.0",
+      "eslint-plugin-import": "^2.18.2",
+      "eslint-plugin-jsx-a11y": "^6.2.3",
+      "eslint-plugin-react": "^7.16.0",
+      "eslint-plugin-react-hooks": "^2.3.0",
+      "husky": "^3.0.0",
+      "jest": "^24.8.0",
+      "lint-staged": "^9.2.0",
+      "prettier": "^1.18.2",
+      "stylelint": "^10.1.0",
+      "stylelint-config-lost": "0.0.3",
+      "stylelint-config-recommended": "^2.2.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

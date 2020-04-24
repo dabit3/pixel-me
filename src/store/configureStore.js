@@ -31,6 +31,7 @@ const createIncludedActions = () =>
   ]);
 
 const configureStore = devMode => {
+  console.log('devMode: ', devMode);
   let store;
   if (devMode) {
     store = createStore(

@@ -1,5 +1,5 @@
 import * as actionCreators from '../store/actions/actionCreators';
-import { initStorage, getDataFromStorage } from './storage';
+import { initStorage } from './storage';
 
 /*
   Initial actions to dispatch:
@@ -8,34 +8,6 @@ import { initStorage, getDataFromStorage } from './storage';
 */
 const initialSetup = (dispatch, storage) => {
   dispatch(actionCreators.hideSpinner());
-
-  const dataStored = getDataFromStorage(storage);
-  if (dataStored) {
-    // Load current project from the storage
-    const currentProjectIndex = dataStored.current;
-    if (currentProjectIndex >= 0) {
-      const {
-        frames,
-        paletteGridData,
-        columns,
-        rows,
-        cellSize
-      } = dataStored.stored[currentProjectIndex];
-
-      dispatch(
-        actionCreators.setDrawing(
-          frames,
-          paletteGridData,
-          cellSize,
-          columns,
-          rows
-        )
-      );
-    }
-  } else {
-    // If no data initialize storage
-    initStorage(storage);
-  }
 };
 
 export default initialSetup;
