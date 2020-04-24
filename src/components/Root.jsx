@@ -14,10 +14,10 @@ function Router({ store }) {
           <Route exact path="/">
             <Drawings store={store} dispatch={store.dispatch} />
           </Route>
-          <Route path="/create/:id">
+          <Route path="/create/:id/:name?">
             <Drawing store={store} dispatch={store.dispatch} />
           </Route>
-          <Route path="/drawing/:id">
+          <Route path="/drawing/:id/:name?">
             <Drawing store={store} dispatch={store.dispatch} />
           </Route>
         </Switch>
