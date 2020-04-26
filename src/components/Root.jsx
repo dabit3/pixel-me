@@ -19,7 +19,7 @@ function Router({ store }) {
           <Route exact path="/">
             <Drawings store={store} dispatch={store.dispatch} clientId={CLIENT_ID} />
           </Route>
-          <Route path="/create/:id/:name?">
+          <Route path="/create/:id/:name?/:drawingVisibility?">
             <Drawing store={store} dispatch={store.dispatch} clientId={CLIENT_ID} />
           </Route>
           <Route path="/drawing/:id/:name?">

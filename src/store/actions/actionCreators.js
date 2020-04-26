@@ -156,12 +156,10 @@ export function createNewFrame(clientId, drawingId) {
   };
 }
 
-export function deleteFrame(frameId, clientId, drawingId) {
+export function deleteFrame(frameId) {
   return {
     type: types.DELETE_FRAME,
     frameId,
-    clientId,
-    drawingId
   };
 }
 

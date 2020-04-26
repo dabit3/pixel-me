@@ -47,15 +47,20 @@ class App extends React.Component {
     this.subscribe()
     const currentState = this.props.store.getState().present.toJS()
     const { activeIndex, ...framesToSet } = currentState.frames
-    const { id } = this.props.match.params;
+    const { id, name, drawingVisibility } = this.props.match.params;
+    console.log('drawingVisibility: ', drawingVisibility)
+    console.log('name: ', name)
+    console.log('id:', id)
     try {
       dispatch(setDrawingId(id));
+      const isPublic = drawingVisibility === 'public'
       const drawingData = JSON.stringify(framesToSet);
       const drawing = {
         id,
-        name: 'Hello World',
+        name,
         clientId: this.props.clientId,
         itemType: 'Drawing',
+        public: isPublic,
         data: drawingData
       };
       console.log('drawing: ', drawing);
@@ -146,7 +151,7 @@ class App extends React.Component {
               : null
           }
         >
-          <FramesHandlerContainer clientId={this.props.clientId} drawingId={id} />
+          <FramesHandlerContainer />
         </div>
         <div className="app__central-container">
           <div className="left col-1-4">

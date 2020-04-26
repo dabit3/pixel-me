@@ -205,7 +205,7 @@ const changeFrameInterval = updateInterval(
   (previousInterval, { interval }) => interval
 );
 
-const debouncedAPICall = debounce(updateApiWithClientId, 250);
+const debouncedAPICall = debounce(updateApiWithClientId, 200);
 
 export default function(frames, action, clientId, drawingId) {
   switch (action.type) {

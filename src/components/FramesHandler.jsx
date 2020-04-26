@@ -50,8 +50,6 @@ class FramesHandler extends React.Component {
         rows={rows}
         active={activeIndex === index}
         lastFrame={list.size - 1 === index}
-        clientId={this.props.clientId}
-        drawingId={this.props.drawingId}
         actions={{
           changeActiveFrame: actions.changeActiveFrame,
           deleteFrame: actions.deleteFrame,
