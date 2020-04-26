@@ -3,10 +3,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Picker from './Picker';
 import * as actionCreators from '../store/actions/actionCreators';
+import { withRouter } from 'react-router'
 
 const Dimensions = props => {
+  const { id } = props.match.params;
   const changeDimensions = (gridProperty, behaviour) => {
-    props.actions.changeDimensions(gridProperty, behaviour);
+    props.actions.changeDimensions(gridProperty, behaviour, id);
   };
 
   const { columns, rows } = props;
@@ -32,4 +34,5 @@ const DimensionsContainer = connect(
   mapStateToProps,
   mapDispatchToProps
 )(Dimensions);
-export default DimensionsContainer;
+
+export default withRouter(DimensionsContainer);

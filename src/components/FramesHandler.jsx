@@ -50,6 +50,8 @@ class FramesHandler extends React.Component {
         rows={rows}
         active={activeIndex === index}
         lastFrame={list.size - 1 === index}
+        clientId={this.props.clientId}
+        drawingId={this.props.drawingId}
         actions={{
           changeActiveFrame: actions.changeActiveFrame,
           deleteFrame: actions.deleteFrame,
@@ -62,7 +64,7 @@ class FramesHandler extends React.Component {
 
   handleClick() {
     const { actions } = this.props;
-    actions.createNewFrame();
+    actions.createNewFrame(this.props.clientId, this.props.drawingId);
     this.setState({ newFrame: true });
   }
 

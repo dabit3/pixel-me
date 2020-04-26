@@ -1,6 +1,20 @@
 import { ActionCreators } from 'redux-undo';
 import * as types from './actionTypes';
 
+export function setClientId(clientId) {
+  return {
+    type: types.SET_CLIENT_ID,
+    clientId
+  }
+}
+
+export function setDrawingId(drawingId) {
+  return {
+    type: types.SET_DRAWING_ID,
+    drawingId
+  }
+}
+
 export function setInitialState(options) {
   return {
     type: types.SET_INITIAL_STATE,
@@ -8,11 +22,12 @@ export function setInitialState(options) {
   };
 }
 
-export function changeDimensions(gridProperty, increment) {
+export function changeDimensions(gridProperty, increment, id) {
   return {
     type: types.CHANGE_DIMENSIONS,
     gridProperty,
-    increment
+    increment,
+    id
   };
 }
 
@@ -133,16 +148,20 @@ export function reorderFrame(selectedIndex, destinationIndex) {
   };
 }
 
-export function createNewFrame() {
+export function createNewFrame(clientId, drawingId) {
   return {
-    type: types.CREATE_NEW_FRAME
+    type: types.CREATE_NEW_FRAME,
+    clientId,
+    drawingId
   };
 }
 
-export function deleteFrame(frameId) {
+export function deleteFrame(frameId, clientId, drawingId) {
   return {
     type: types.DELETE_FRAME,
-    frameId
+    frameId,
+    clientId,
+    drawingId
   };
 }
 

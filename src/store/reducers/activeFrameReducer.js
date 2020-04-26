@@ -1,4 +1,6 @@
 import * as types from '../actions/actionTypes';
+import { API } from 'aws-amplify'
+import { updateDrawing } from '../../graphql/mutations'
 
 export const GRID_INITIAL_COLOR = 'rgba(49, 49, 49, 1)';
 
@@ -203,13 +205,19 @@ const changeFrameInterval = updateInterval(
   (previousInterval, { interval }) => interval
 );
 
-export default function(frames, action) {
+export default function(frames, action, clientId, drawingId) {
   switch (action.type) {
     case types.APPLY_PENCIL:
+      const newFrames = applyPencil(frames, action).toJS()
+      updateApiWithClientId(newFrames, drawingId, clientId)
       return applyPencil(frames, action);
     case types.APPLY_ERASER:
+      const frameData = applyEraser(frames, action).toJS()
+      updateApiWithClientId(frameData, drawingId, clientId)
       return applyEraser(frames, action);
     case types.APPLY_BUCKET:
+      const updatedFrameData = applyBucket(frames, action).toJS()
+      updateApiWithClientId(updatedFrameData, drawingId, clientId)
       return applyBucket(frames, action);
     case types.MOVE_DRAWING:
       return applyMove(frames, action);
@@ -219,5 +227,20 @@ export default function(frames, action) {
       return changeFrameInterval(frames, action);
     default:
       return frames;
+  }
+}
+
+async function updateApiWithClientId(newFrames, id, clientId) {
+  const { activeIndex, ...frames } = newFrames
+  const drawing = { id, clientId, data: JSON.stringify(frames) }
+  try {
+    console.log('drawing:', drawing)
+    await API.graphql({
+      query: updateDrawing,
+      variables: { input: drawing }
+    })
+    console.log('successfully updated drawing: ', drawing)
+  } catch (err) {
+    console.log('error updating: ', err)
   }
 }

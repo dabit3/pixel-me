@@ -13,7 +13,7 @@ export default class Frame extends React.Component {
     const { active, actions, dataId } = this.props;
     e.stopPropagation();
     if (active) {
-      actions.deleteFrame(dataId);
+      actions.deleteFrame(dataId, this.props.clientId, this.props.drawingId);
     }
   }
 

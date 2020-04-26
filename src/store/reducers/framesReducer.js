@@ -1,6 +1,8 @@
 import { List, Map, fromJS } from 'immutable';
 import shortid from 'shortid';
 import * as types from '../actions/actionTypes';
+import { API } from 'aws-amplify'
+import { updateDrawing } from '../../graphql/mutations'
 
 const createGrid = numCells => {
   let newGrid = List();
@@ -182,26 +184,71 @@ const setFrames = (frames, action) => {
   });
 };
 
-export default function(frames = initFrames(), action) {
+const setFramesFromAPI = (frames) => {
+  return fromJS(frames);
+};
+
+export default function(frames = initFrames(), action, clientId, drawingId) {
   switch (action.type) {
     case types.SET_INITIAL_STATE:
     case types.NEW_PROJECT:
       return initFrames(action);
     case types.SET_DRAWING:
       return setFrames(frames, action);
+    case types.SET_DRAWING_FROM_API:
+      const framesWithActiveIndex = { ...frames.toJS(), ...action.frames }
+      return setFramesFromAPI(framesWithActiveIndex);
     case types.CHANGE_ACTIVE_FRAME:
       return changeActiveFrame(frames, action);
     case types.REORDER_FRAME:
       return reorderFrame(frames, action);
     case types.CREATE_NEW_FRAME:
+      const newFrame = createNewFrame(frames, action).toJS()
+      updateApiWithClientId(newFrame, drawingId, clientId)
       return createNewFrame(frames);
     case types.DELETE_FRAME:
+      const newFrames = deleteFrame(frames, action).toJS()
+      updateApiWithClientId(newFrames, drawingId, clientId)
       return deleteFrame(frames, action);
     case types.DUPLICATE_FRAME:
+      const newFrameData = duplicateFrame(frames, action).toJS()
+      updateApiWithClientId(newFrameData, drawingId, clientId)
       return duplicateFrame(frames, action);
     case types.CHANGE_DIMENSIONS:
+      const newDimensions = changeDimensions(frames, action).toJS()
+      updateApi(newDimensions, drawingId)
       return changeDimensions(frames, action);
     default:
       return frames;
+  }
+}
+
+async function updateApiWithClientId(newFrames, id, clientId) {
+  const { activeIndex, ...frames } = newFrames
+  const drawing = { id, clientId, data: JSON.stringify(frames) }
+  try {
+    console.log('drawing:', drawing)
+    await API.graphql({
+      query: updateDrawing,
+      variables: { input: drawing }
+    })
+    console.log('successfully updated drawing: ', drawing)
+  } catch (err) {
+    console.log('error updating: ', err)
+  }
+}
+
+async function updateApi(newFrames, id) {
+  const { activeIndex, ...frames } = newFrames
+  const drawing = { id, data: JSON.stringify(frames) }
+  try {
+    console.log('drawing:', drawing)
+    await API.graphql({
+      query: updateDrawing,
+      variables: { input: drawing }
+    })
+    console.log('successfully updated drawing: ', drawing)
+  } catch (err) {
+    console.log('error updating: ', err)
   }
 }

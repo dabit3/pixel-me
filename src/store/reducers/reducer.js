@@ -7,12 +7,16 @@ import * as types from '../actions/actionTypes';
 
 function setInitialState(state) {
   const cellSize = 10;
+  const clientId = '';
+  const drawingId = '';
 
   const initialState = {
     cellSize,
     loading: false,
     notifications: List(),
-    duration: 1
+    duration: 1,
+    clientId,
+    drawingId
   };
 
   return state.merge(initialState);
@@ -58,8 +62,8 @@ function generateDefaultState() {
   return setInitialState(Map(), { type: types.SET_INITIAL_STATE, state: {} });
 }
 
-const pipeReducers = reducers => (initialState, action) =>
-  reducers.reduce((state, reducer) => reducer(state, action), initialState);
+const pipeReducers = reducers => (initialState, action, clientId, drawingId) =>
+  reducers.reduce((state, reducer) => reducer(state, action, clientId, drawingId), initialState);
 
 function partialReducer(state, action) {
   switch (action.type) {
@@ -78,22 +82,28 @@ function partialReducer(state, action) {
     case types.SET_DURATION:
       return setDuration(state, action.duration);
     case types.NEW_PROJECT:
-      console.log('initialstate: ', setInitialState(state).toJS());
       return setInitialState(state);
     case types.UPDATE_GRID_BOUNDARIES:
       return updateGridBoundaries(state, action);
+    case types.SET_CLIENT_ID:
+      return state.set('clientId', action.clientId)
+    case types.SET_DRAWING_ID:
+      return state.set('drawingId', action.drawingId)
     default:
   }
   return state;
 }
 
 export default function(state = generateDefaultState(), action) {
+  const frameData = state.get('frames')
   return partialReducer(state, action).merge({
     drawingTool: drawingToolReducer(state.get('drawingTool'), action),
     palette: paletteReducer(state.get('palette'), action),
     frames: pipeReducers([framesReducer, activeFrameReducer])(
       state.get('frames'),
-      action
+      action,
+      state.get('clientId'),
+      state.get('drawingId')
     )
   });
 }

@@ -22,12 +22,11 @@ import UndoRedoContainer from './UndoRedo';
 import initialSetup from '../utils/startup';
 import drawHandlersProvider from '../utils/drawHandlersProvider';
 import { withRouter } from 'react-router';
-import { v4 as uuid } from 'uuid';
-import { createDrawing } from '../graphql/mutations';
+import { createDrawing, updateDrawing } from '../graphql/mutations';
+import { onUpdateDrawing } from '../graphql/subscriptions'
+import { setDrawingId } from '../store/actions/actionCreators'
 
 import { API } from 'aws-amplify';
-
-const CLIENT_ID = uuid();
 
 class App extends React.Component {
   constructor() {
@@ -36,25 +35,26 @@ class App extends React.Component {
       modalType: null,
       modalOpen: false,
       helpOn: false,
-      showCookiesBanner: true
+      showCookiesBanner: false
     };
     Object.assign(this, drawHandlersProvider(this));
+    this.subscription = {}
   }
 
   async componentDidMount() {
     const { dispatch } = this.props;
     initialSetup(dispatch);
-
+    this.subscribe()
+    const currentState = this.props.store.getState().present.toJS()
+    const { activeIndex, ...framesToSet } = currentState.frames
+    const { id } = this.props.match.params;
     try {
-      const { id } = this.props.match.params;
-      console.log('id: ', id);
-      const drawingData = JSON.stringify(
-        this.props.store.getState().present.toJS()
-      );
+      dispatch(setDrawingId(id));
+      const drawingData = JSON.stringify(framesToSet);
       const drawing = {
         id,
         name: 'Hello World',
-        clientId: uuid(),
+        clientId: this.props.clientId,
         itemType: 'Drawing',
         data: drawingData
       };
@@ -64,15 +64,35 @@ class App extends React.Component {
         variables: { input: drawing }
       });
       console.log('item created!');
-    } catch (err) {}
+    } catch (err) {
+      console.log('drawing already created... fetching drawing', err)
+      if (err.errors[0] && err.errors[0].errorType && err.errors[0].errorType === "DynamoDB:ConditionalCheckFailedException") {
+        const frames = JSON.parse(err.errors[0].data.data)
+        console.log('frames: ', frames)
+        dispatch({ type: "SET_DRAWING_FROM_API", frames: { ...frames, activeIndex: 0 } })
+      }
+    }
 
-    console.log('state: ', this.props.store.getState());
-    console.log('present: ', this.props.store.getState().present.toJS());
   }
 
-  componentWillUpdate() {
-    const currentState = this.props.store.getState().present.toJS();
-    console.log('currentState: ', currentState);
+  subscribe() {
+    const { dispatch } = this.props;
+    API.graphql({
+      query: onUpdateDrawing
+    })
+    .subscribe({
+      next: drawingData =>  {
+        const { value: { data: { onUpdateDrawing, onUpdateDrawing: { data }}} } = drawingData
+        if (onUpdateDrawing.clientId === this.props.clientId) return
+        const currentState = this.props.store.getState().present.toJS()
+        let { activeIndex } = currentState.frames
+        const frameData = JSON.parse(data)
+        if (frameData.list.length - 1 < activeIndex) {
+          activeIndex = activeIndex - 1
+        }
+        dispatch({ type: "SET_DRAWING_FROM_API", frames: { ...JSON.parse(data), activeIndex } })
+      }
+    })
   }
 
   changeModalType(type) {
@@ -101,6 +121,7 @@ class App extends React.Component {
 
   render() {
     const { helpOn, showCookiesBanner, modalType, modalOpen } = this.state;
+    const { id } = this.props.match.params;
     return (
       <div
         className="app__main"
@@ -125,7 +146,7 @@ class App extends React.Component {
               : null
           }
         >
-          <FramesHandlerContainer />
+          <FramesHandlerContainer clientId={this.props.clientId} drawingId={id} />
         </div>
         <div className="app__central-container">
           <div className="left col-1-4">

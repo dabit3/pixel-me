@@ -1,8 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
+import { API } from 'aws-amplify'
+import { Link } from 'react-router-dom'
+import { itemsByType } from '../graphql/queries'
 
 export default function Drawings() {
+  const [drawings, setDrawings] = useState([])
+  const [loading, updateLoading] = useState(true)
+  useEffect(() => {
+    fetchDrawings()
+  }, [])
+  async function fetchDrawings() {
+    try {
+      const apiData = await API.graphql({ query: itemsByType, variables: { limit: 10, itemType: "Drawing" }})
+      console.log('apiData: ', apiData)
+      setDrawings(apiData.data.itemsByType.items)
+    } catch (err) {
+      console.log('error fetching drawings...: ', err)
+    }
+  }
   let history = useHistory();
   function handleClick() {
     const id = uuid();
@@ -11,7 +28,15 @@ export default function Drawings() {
   return (
     <div>
       <Dialog handleClick={handleClick} />
-      <h1>Hello from Drawings</h1>
+      {
+        drawings.map(drawing => (
+          <h1 key={drawing.id}>
+            <Link to={`/drawing/${drawing.id}/${drawing.name}`} style={drawingNameStyle}>
+              { drawing.name }
+            </Link>
+          </h1>
+        ))
+      }
     </div>
   );
 }
@@ -30,6 +55,11 @@ function Dialog({ handleClick }) {
       </div>
     </div>
   )
+}
+
+const drawingNameStyle = {
+  color: "#ff59e3",
+  textDecoration: 'none'
 }
 
 const dialogStyle = {

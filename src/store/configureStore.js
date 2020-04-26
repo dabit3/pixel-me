@@ -13,7 +13,9 @@ import {
   NEW_PROJECT,
   SET_DRAWING,
   SET_CELL_SIZE,
-  SET_RESET_GRID
+  SET_RESET_GRID,
+  SET_CLIENT_ID,
+  SET_DRAWING_ID
 } from './actions/actionTypes';
 
 const createIncludedActions = () =>
@@ -27,11 +29,12 @@ const createIncludedActions = () =>
     SET_DRAWING,
     SET_CELL_SIZE,
     SET_RESET_GRID,
-    NEW_PROJECT
+    NEW_PROJECT,
+    SET_CLIENT_ID,
+    SET_DRAWING_ID
   ]);
 
 const configureStore = devMode => {
-  console.log('devMode: ', devMode);
   let store;
   if (devMode) {
     store = createStore(
