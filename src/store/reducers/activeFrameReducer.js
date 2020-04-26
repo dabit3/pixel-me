@@ -205,11 +205,13 @@ const changeFrameInterval = updateInterval(
   (previousInterval, { interval }) => interval
 );
 
+const debouncedAPICall = debounce(updateApiWithClientId, 250);
+
 export default function(frames, action, clientId, drawingId) {
   switch (action.type) {
     case types.APPLY_PENCIL:
       const newFrames = applyPencil(frames, action).toJS()
-      updateApiWithClientId(newFrames, drawingId, clientId)
+      debouncedAPICall(newFrames, drawingId, clientId)
       return applyPencil(frames, action);
     case types.APPLY_ERASER:
       const frameData = applyEraser(frames, action).toJS()
@@ -229,6 +231,30 @@ export default function(frames, action, clientId, drawingId) {
       return frames;
   }
 }
+
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function executedFunction() {
+    var context = this;
+    var args = arguments;
+	    
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+
+    var callNow = immediate && !timeout;
+	
+    clearTimeout(timeout);
+
+    timeout = setTimeout(later, wait);
+	
+    if (callNow) {
+      console.log('about to apply function...')
+      func.apply(context, args);
+    }
+  };
+};
 
 async function updateApiWithClientId(newFrames, id, clientId) {
   const { activeIndex, ...frames } = newFrames
