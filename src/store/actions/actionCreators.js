@@ -7,6 +7,12 @@ export function lockDrawing() {
   }
 }
 
+export function unlockDrawing() {
+  return {
+    type: types.UNLOCK_DRAWING
+  }
+}
+
 export function duplicateDrawing() {
   return {
     type: types.DUPLICATE_DRAWING

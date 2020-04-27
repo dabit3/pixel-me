@@ -195,6 +195,8 @@ export default function(frames = initFrames(), action, clientId, drawingId, isLo
       return initFrames(action);
     case types.SET_DRAWING:
       if (isLocked) return frames
+      const setFramesFromAction = setFrames(frames, action).toJS()
+      updateApiWithClientId(setFramesFromAction, drawingId, clientId)
       return setFrames(frames, action);
     case types.SET_DRAWING_FROM_API:
       const framesWithActiveIndex = { ...frames.toJS(), ...action.frames }

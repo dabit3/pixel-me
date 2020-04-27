@@ -29,7 +29,6 @@ import { createDrawing } from '../graphql/mutations';
 import { onUpdateByID } from '../graphql/subscriptions'
 import { setDrawingId, lockDrawing } from '../store/actions/actionCreators'
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
 
 import { API, graphqlOperation } from 'aws-amplify';
 
@@ -66,7 +65,6 @@ class App extends React.Component {
         public: isPublic,
         data: drawingData
       };
-      console.log('drawing: ', drawing);
       await API.graphql({
         query: createDrawing,
         variables: { input: drawing }
@@ -401,7 +399,6 @@ class App extends React.Component {
 
 const mapStateToProps = state => {
   const currentState = state.present.toJS()
-  console.log('currentState:', currentState)
   return {
     frames: currentState.frames,
     isLocked: currentState.isLocked

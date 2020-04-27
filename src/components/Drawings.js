@@ -43,15 +43,17 @@ export default function Drawings() {
       <button onClick={() => setModalVisible(true)} style={buttonStyle}>
         Create new Drawing
       </button>
-      {
-        drawings.map(drawing => (
-          <h1 key={drawing.id}>
-            <Link to={`/drawing/${drawing.id}/${drawing.name}`} style={drawingNameStyle}>
-              { drawing.name }
-            </Link>
-          </h1>
-        ))
-      }
+      <div  style={containerStyle}>
+        {
+          drawings.map(drawing => (
+            <h1 key={drawing.id}>
+              <Link to={`/drawing/${drawing.id}/${drawing.name}`} style={drawingNameStyle}>
+                { drawing.name }
+              </Link>
+            </h1>
+          ))
+        }
+      </div>
     </div>
   );
 }
@@ -60,7 +62,7 @@ function Dialog({ updateInputValue, handleClick, drawingVisibility, setDrawingVi
   const isPublic = drawingVisibility === 'public'
   return (
     <div style={dialogStyle}>
-      <div style={containerStyle}>
+      <div style={dialogContainerStyle}>
         <input
           style={inputStyle}
           placeholder="Drawing Name"
@@ -108,11 +110,6 @@ const toggleButtonContainer = {
   marginTop: 10
 }
 
-const drawingNameStyle = {
-  color: "#ff59e3",
-  textDecoration: 'none'
-}
-
 const dialogStyle = {
   display: 'flex',
   justifyContent: 'center',
@@ -128,10 +125,14 @@ const dialogStyle = {
   backgroundColor: "#ddd",
 }
 
-const containerStyle = {
+const dialogContainerStyle = {
   display: 'flex',
   flexDirection: 'column',
   width: '300px'
+}
+
+const containerStyle = {
+  marginTop: 40
 }
 
 const inputStyle = {
@@ -142,3 +143,8 @@ const inputStyle = {
 const buttonStyle = {
   padding: '10px 20px',
 };
+
+const drawingNameStyle = {
+  color: "#ff59e3",
+  textDecoration: 'none'
+}

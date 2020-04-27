@@ -92,6 +92,8 @@ function partialReducer(state, action) {
       return state.set('drawingId', action.drawingId)
     case types.LOCK_DRAWING:
       return state.set('isLocked', true)
+    case types.UNLOCK_DRAWING:
+      return state.set('isLocked', false)
     default:
   }
   return state;

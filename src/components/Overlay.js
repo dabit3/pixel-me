@@ -1,9 +1,39 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux';
-import { duplicateDrawing, lockDrawing } from '../store/actions/actionCreators';
+import { duplicateDrawing, lockDrawing, unlockDrawing } from '../store/actions/actionCreators';
+import { useHistory } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
+import { API } from 'aws-amplify'
+import { createDrawing } from '../graphql/mutations'
 
-function Overlay({ type, toggleOverlay, lockDrawingDispatch }) {
+function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispatch, clientId, frames }) {
+  let history = useHistory();
   const [drawingVisibility, setDrawingVisibility] = useState('public')
+  const [drawingName, updateDrawingName] = useState('') 
+  async function duplicate() {
+    if (!drawingName) return
+    const id = uuid()
+    const frameData = JSON.stringify(frames)
+    const isPublic = drawingVisibility === 'public'
+    const drawing = {
+      id,
+      name: drawingName,
+      itemType: isPublic ? 'Drawing' : 'PrivateDrawing',
+      public: isPublic,
+      data: frameData,
+      clientId
+    };
+    console.log('drawing: ', drawing)
+    try {
+      await API.graphql({ query: createDrawing, variables: { input: drawing }})
+      toggleOverlay('', false);
+      unlockDrawingDispatch();
+      history.push(`/create/${id}`);
+      console.log('new drawing created...')
+    } catch (err) {
+      console.log('error...: ', err)
+    }
+  }
   return (
     <div style={dialogStyle(type)}>
       <div style={containerStyle}>
@@ -12,8 +42,8 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch }) {
             <div>
               <p>This drawing will no longer be editable.</p>
                 <button onClick={() => {
-                  lockDrawingDispatch()
-                  toggleOverlay('', false)
+                  lockDrawingDispatch();
+                  toggleOverlay('', false);
                 }} style={buttonStyle}>
                 Confirm Lock
               </button>
@@ -24,7 +54,7 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch }) {
               <input
                 style={inputStyle}
                 placeholder="Drawing Name"
-                onChange={e => updateInputValue(e.target.value)}
+                onChange={e => updateDrawingName(e.target.value)}
               />
               <div style={toggleButtonContainer}>
                 <button
@@ -36,9 +66,12 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch }) {
                 onClick={() => setDrawingVisibility('private')}
                 >Private</button>
               </div>
-    
-              <button onClick={handleClick} style={buttonStyle}>
-                Create
+              {
+                drawingVisibility === 'public' ? <p>This drawing will be listed in the main app.</p>
+                : <p>This drawing will not be listed in the main app.</p>
+              }
+              <button onClick={duplicate} style={buttonStyle}>
+                Duplicate
               </button>
               <p style={cancelButton} onClick={() => setModalVisible(false)}>Cancel</p>
               </div>
@@ -51,11 +84,20 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch }) {
 
 const mapDispatchToProps = dispatch => ({
   duplicateDrawingDispatch: () => dispatch(duplicateDrawing()),
-  lockDrawingDispatch: () => dispatch(lockDrawing())
+  lockDrawingDispatch: () => dispatch(lockDrawing()),
+  unlockDrawingDispatch: () => dispatch(unlockDrawing())
 });
 
+const mapStateToProps = state => {
+  const currentState = state.present.toJS()
+  return {
+    frames: currentState.frames,
+    clientId: currentState.clientId
+  }
+};
+
 const OverlayContainer = connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(Overlay);
 export default OverlayContainer;
@@ -106,5 +148,5 @@ const inputStyle = {
 }
 
 const buttonStyle = {
-  padding: '10px 20px',
+  padding: '6px 20px',
 };
