@@ -14,6 +14,8 @@ import EyedropperContainer from './Eyedropper';
 import FramesHandlerContainer from './FramesHandler';
 import PaletteGridContainer from './PaletteGrid';
 import ResetContainer from './Reset';
+import DuplicateContainer from './Duplicate'
+import LockContainer from './Lock'
 import SaveDrawingContainer from './SaveDrawing';
 import NewProjectContainer from './NewProject';
 import SimpleNotificationContainer from './SimpleNotification';
@@ -21,12 +23,15 @@ import SimpleSpinnerContainer from './SimpleSpinner';
 import UndoRedoContainer from './UndoRedo';
 import initialSetup from '../utils/startup';
 import drawHandlersProvider from '../utils/drawHandlersProvider';
+import Overlay from './Overlay'
 import { withRouter } from 'react-router';
-import { createDrawing, updateDrawing } from '../graphql/mutations';
-import { onUpdateDrawing } from '../graphql/subscriptions'
-import { setDrawingId } from '../store/actions/actionCreators'
+import { createDrawing } from '../graphql/mutations';
+import { onUpdateByID } from '../graphql/subscriptions'
+import { setDrawingId, lockDrawing } from '../store/actions/actionCreators'
+import { connect } from 'react-redux';
+import { Map } from 'immutable';
 
-import { API } from 'aws-amplify';
+import { API, graphqlOperation } from 'aws-amplify';
 
 class App extends React.Component {
   constructor() {
@@ -35,7 +40,9 @@ class App extends React.Component {
       modalType: null,
       modalOpen: false,
       helpOn: false,
-      showCookiesBanner: false
+      showCookiesBanner: false,
+      overlayType: '',
+      showOverlay: false,
     };
     Object.assign(this, drawHandlersProvider(this));
     this.subscription = {}
@@ -45,12 +52,8 @@ class App extends React.Component {
     const { dispatch } = this.props;
     initialSetup(dispatch);
     this.subscribe()
-    const currentState = this.props.store.getState().present.toJS()
-    const { activeIndex, ...framesToSet } = currentState.frames
+    const { activeIndex, ...framesToSet } = this.props.frames
     const { id, name, drawingVisibility } = this.props.match.params;
-    console.log('drawingVisibility: ', drawingVisibility)
-    console.log('name: ', name)
-    console.log('id:', id)
     try {
       dispatch(setDrawingId(id));
       const isPublic = drawingVisibility === 'public'
@@ -59,7 +62,7 @@ class App extends React.Component {
         id,
         name,
         clientId: this.props.clientId,
-        itemType: 'Drawing',
+        itemType: isPublic ? 'Drawing' : 'PrivateDrawing',
         public: isPublic,
         data: drawingData
       };
@@ -72,25 +75,30 @@ class App extends React.Component {
     } catch (err) {
       console.log('drawing already created... fetching drawing', err)
       if (err.errors[0] && err.errors[0].errorType && err.errors[0].errorType === "DynamoDB:ConditionalCheckFailedException") {
-        const frames = JSON.parse(err.errors[0].data.data)
-        console.log('frames: ', frames)
+        const APIData = err.errors[0].data
+        const frames = JSON.parse(APIData.data)
+        const isLocked = APIData.locked === true
+        if (isLocked) {
+          dispatch(lockDrawing())
+        }
         dispatch({ type: "SET_DRAWING_FROM_API", frames: { ...frames, activeIndex: 0 } })
       }
     }
+  }
 
+  componentWillUnmount() {
+    this.subscription.unsubscribe()
   }
 
   subscribe() {
     const { dispatch } = this.props;
-    API.graphql({
-      query: onUpdateDrawing
-    })
+    const { id, name } = this.props.match.params;
+    this.subscription = API.graphql(graphqlOperation(onUpdateByID, { id }))
     .subscribe({
       next: drawingData =>  {
-        const { value: { data: { onUpdateDrawing, onUpdateDrawing: { data }}} } = drawingData
-        if (onUpdateDrawing.clientId === this.props.clientId) return
-        const currentState = this.props.store.getState().present.toJS()
-        let { activeIndex } = currentState.frames
+        const { value: { data: { onUpdateByID, onUpdateByID: { data }}} } = drawingData
+        if (onUpdateByID.clientId === this.props.clientId) return
+        let { activeIndex } = this.props.frames
         const frameData = JSON.parse(data)
         if (frameData.list.length - 1 < activeIndex) {
           activeIndex = activeIndex - 1
@@ -124,9 +132,15 @@ class App extends React.Component {
     this.setState({ helpOn: !helpOn });
   }
 
+  toggleOverlay(overlayType, showOverlay) {
+    this.setState({
+      overlayType, showOverlay
+    })
+  }
+
   render() {
     const { helpOn, showCookiesBanner, modalType, modalOpen } = this.state;
-    const { id } = this.props.match.params;
+    const { isLocked } = this.props
     return (
       <div
         className="app__main"
@@ -178,9 +192,13 @@ class App extends React.Component {
                       <SaveDrawingContainer />
                     </div>
                   </div>
-                  <div data-tooltip={helpOn ? 'Undo Redo actions' : null}>
-                    <UndoRedoContainer />
-                  </div>
+                  {
+                    !isLocked && (
+                      <div data-tooltip={helpOn ? 'Undo Redo actions' : null}>
+                        <UndoRedoContainer />
+                      </div>
+                    )
+                  }
                   <div className="app__tools-wrapper grid-3">
                     <div
                       data-tooltip={
@@ -293,11 +311,29 @@ class App extends React.Component {
                   >
                     PREVIEW
                   </button>
+                  {
+                    !isLocked && (
+                      <div
+                        data-tooltip={helpOn ? 'Reset the selected frame' : null}
+                      >
+                        <ResetContainer />
+                      </div>
+                        )
+                      }
                   <div
-                    data-tooltip={helpOn ? 'Reset the selected frame' : null}
+                    data-tooltip={helpOn ? 'Duplicate this drawing' : null}
                   >
-                    <ResetContainer />
+                    <DuplicateContainer toggleOverlay={this.toggleOverlay.bind(this)} />
                   </div>
+                  {
+                    !isLocked && (
+                      <div
+                        data-tooltip={helpOn ? 'Lock this drawing. This will make it no longer editable' : null}
+                      >
+                        <LockContainer toggleOverlay={this.toggleOverlay.bind(this)} />
+                      </div>
+                    )
+                  }
                   <div
                     data-tooltip={helpOn ? 'Number of columns and rows' : null}
                   >
@@ -350,9 +386,31 @@ class App extends React.Component {
             this.changeModalType(modalType);
           }}
         />
+        {
+          this.state.showOverlay && (
+            <Overlay
+              type={this.state.overlayType}
+              toggleOverlay={this.toggleOverlay.bind(this)}
+            />
+          )
+        }
       </div>
     );
   }
 }
 
-export default withRouter(App);
+const mapStateToProps = state => {
+  const currentState = state.present.toJS()
+  console.log('currentState:', currentState)
+  return {
+    frames: currentState.frames,
+    isLocked: currentState.isLocked
+  }
+};
+
+const AppContainer = connect(
+  mapStateToProps
+)(App);
+
+
+export default withRouter(AppContainer);

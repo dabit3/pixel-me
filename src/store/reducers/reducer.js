@@ -16,7 +16,8 @@ function setInitialState(state) {
     notifications: List(),
     duration: 1,
     clientId,
-    drawingId
+    drawingId,
+    isLocked: false
   };
 
   return state.merge(initialState);
@@ -62,8 +63,8 @@ function generateDefaultState() {
   return setInitialState(Map(), { type: types.SET_INITIAL_STATE, state: {} });
 }
 
-const pipeReducers = reducers => (initialState, action, clientId, drawingId) =>
-  reducers.reduce((state, reducer) => reducer(state, action, clientId, drawingId), initialState);
+const pipeReducers = reducers => (initialState, action, clientId, drawingId, isLocked) =>
+  reducers.reduce((state, reducer) => reducer(state, action, clientId, drawingId, isLocked), initialState);
 
 function partialReducer(state, action) {
   switch (action.type) {
@@ -89,6 +90,8 @@ function partialReducer(state, action) {
       return state.set('clientId', action.clientId)
     case types.SET_DRAWING_ID:
       return state.set('drawingId', action.drawingId)
+    case types.LOCK_DRAWING:
+      return state.set('isLocked', true)
     default:
   }
   return state;
@@ -98,12 +101,13 @@ export default function(state = generateDefaultState(), action) {
   const frameData = state.get('frames')
   return partialReducer(state, action).merge({
     drawingTool: drawingToolReducer(state.get('drawingTool'), action),
-    palette: paletteReducer(state.get('palette'), action),
+    palette: paletteReducer(state.get('palette'), action, state.get('isLocked')),
     frames: pipeReducers([framesReducer, activeFrameReducer])(
       state.get('frames'),
       action,
       state.get('clientId'),
-      state.get('drawingId')
+      state.get('drawingId'),
+      state.get('isLocked')
     )
   });
 }

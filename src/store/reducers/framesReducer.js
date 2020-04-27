@@ -188,12 +188,13 @@ const setFramesFromAPI = (frames) => {
   return fromJS(frames);
 };
 
-export default function(frames = initFrames(), action, clientId, drawingId) {
+export default function(frames = initFrames(), action, clientId, drawingId, isLocked) {
   switch (action.type) {
     case types.SET_INITIAL_STATE:
     case types.NEW_PROJECT:
       return initFrames(action);
     case types.SET_DRAWING:
+      if (isLocked) return frames
       return setFrames(frames, action);
     case types.SET_DRAWING_FROM_API:
       const framesWithActiveIndex = { ...frames.toJS(), ...action.frames }
@@ -201,25 +202,47 @@ export default function(frames = initFrames(), action, clientId, drawingId) {
     case types.CHANGE_ACTIVE_FRAME:
       return changeActiveFrame(frames, action);
     case types.REORDER_FRAME:
+      if (isLocked) return frames
+      const reorderedFrames = reorderFrame(frames, action).toJS()
+      updateApiWithClientId(reorderedFrames, drawingId, clientId)
       return reorderFrame(frames, action);
     case types.CREATE_NEW_FRAME:
+      if (isLocked) return frames
       const newFrame = createNewFrame(frames, action).toJS()
       updateApiWithClientId(newFrame, drawingId, clientId)
       return createNewFrame(frames);
     case types.DELETE_FRAME:
+      if (isLocked) return frames
       const newFrames = deleteFrame(frames, action).toJS()
       updateApiWithClientId(newFrames, drawingId, clientId)
       return deleteFrame(frames, action);
     case types.DUPLICATE_FRAME:
+      if (isLocked) return frames
       const newFrameData = duplicateFrame(frames, action).toJS()
       updateApiWithClientId(newFrameData, drawingId, clientId)
       return duplicateFrame(frames, action);
     case types.CHANGE_DIMENSIONS:
+      if (isLocked) return frames
       const newDimensions = changeDimensions(frames, action).toJS()
       updateApi(newDimensions, drawingId)
       return changeDimensions(frames, action);
+    case types.LOCK_DRAWING:
+      lockDrawing(drawingId)
     default:
       return frames;
+  }
+}
+
+async function lockDrawing(id) {
+  const drawing = { id, locked: true }
+  try {
+    await API.graphql({
+      query: updateDrawing,
+      variables: { input: drawing }
+    })
+    console.log('successfully updated drawing: ', drawing)
+  } catch (err) {
+    console.log('error updating: ', err)
   }
 }
 

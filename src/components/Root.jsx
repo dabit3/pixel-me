@@ -38,11 +38,6 @@ const Root = ({ store }) => (
 );
 
 function Main({ store }) {
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    fetchData();
-  }, []);
-  async function fetchData() {}
   return <Root store={store} />;
 }
 

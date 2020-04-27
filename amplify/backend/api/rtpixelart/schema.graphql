@@ -8,3 +8,8 @@ type Drawing @model @key(name: "byItemType", fields: ["itemType", "createdAt"], 
   createdAt: String
   locked: Boolean
 }
+
+type Subscription {
+  onUpdateByID(id: ID!): Drawing
+    @aws_subscribe(mutations: ["updateDrawing"])
+}

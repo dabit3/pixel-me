@@ -207,7 +207,8 @@ const changeFrameInterval = updateInterval(
 
 const debouncedAPICall = debounce(updateApiWithClientId, 200);
 
-export default function(frames, action, clientId, drawingId) {
+export default function(frames, action, clientId, drawingId, isLocked) {
+  if (isLocked) return frames
   switch (action.type) {
     case types.APPLY_PENCIL:
       const newFrames = applyPencil(frames, action).toJS()
@@ -222,6 +223,8 @@ export default function(frames, action, clientId, drawingId) {
       updateApiWithClientId(updatedFrameData, drawingId, clientId)
       return applyBucket(frames, action);
     case types.MOVE_DRAWING:
+      const movedFrameData = applyMove(frames, action).toJS()
+      updateApiWithClientId(movedFrameData, drawingId, clientId)
       return applyMove(frames, action);
     case types.SET_RESET_GRID:
       return resetGrid(frames);

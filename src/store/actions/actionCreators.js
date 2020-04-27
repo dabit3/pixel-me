@@ -1,6 +1,18 @@
 import { ActionCreators } from 'redux-undo';
 import * as types from './actionTypes';
 
+export function lockDrawing() {
+  return {
+    type: types.LOCK_DRAWING
+  }
+}
+
+export function duplicateDrawing() {
+  return {
+    type: types.DUPLICATE_DRAWING
+  }
+}
+
 export function setClientId(clientId) {
   return {
     type: types.SET_CLIENT_ID,

@@ -8,7 +8,6 @@ import { itemsByType } from '../graphql/queries'
 export default function Drawings() {
   const [drawings, setDrawings] = useState([])
   const [inputValue, updateInputValue] = useState('')
-  const [loading, updateLoading] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
   const [drawingVisibility, setDrawingVisibility] = useState('public')
   useEffect(() => {
@@ -27,7 +26,7 @@ export default function Drawings() {
   function handleClick() {
     if (!inputValue) return
     const id = uuid();
-    history.push(`/create/${id}/${inputValue}`);
+    history.push(`/create/${id}/${inputValue}/${drawingVisibility}`);
   }
   return (
     <div>

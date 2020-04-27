@@ -29,6 +29,22 @@ export const onUpdateDrawing = /* GraphQL */ `
     }
   }
 `;
+
+export const onUpdateByID = /* GraphQL */ `
+  subscription onUpdateByID($id: ID!) {
+    onUpdateByID(id: $id) {
+      id
+      clientId
+      name
+      data
+      public
+      itemType
+      createdAt
+      locked
+    }
+  }
+`;
+
 export const onDeleteDrawing = /* GraphQL */ `
   subscription OnDeleteDrawing {
     onDeleteDrawing {
