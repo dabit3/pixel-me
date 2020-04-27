@@ -4,24 +4,48 @@ import { v4 as uuid } from 'uuid';
 import { API } from 'aws-amplify'
 import { Link } from 'react-router-dom'
 import { itemsByType } from '../graphql/queries'
+import PixelGrid from './PixelDisplayGrid'
+import { List } from 'immutable'
 
 export default function Drawings() {
   const [drawings, setDrawings] = useState([])
   const [inputValue, updateInputValue] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
   const [drawingVisibility, setDrawingVisibility] = useState('public')
+  const [loading, setLoading] = useState(false)
+  const [nextToken, setNextToken] = useState('')
   useEffect(() => {
     fetchDrawings()
   }, [])
   async function fetchDrawings() {
     try {
       const apiData = await API.graphql({ query: itemsByType, variables: { limit: 10, itemType: "Drawing" }})
-      console.log('apiData: ', apiData)
       setDrawings(apiData.data.itemsByType.items)
+      console.log('apiData:', apiData)
+      if (apiData.data.itemsByType.nextToken) {
+        setNextToken(apiData.data.itemsByType.nextToken)
+      }
     } catch (err) {
       console.log('error fetching drawings...: ', err)
     }
   }
+  async function listMore() {
+    setLoading(true)
+    try {
+      const apiData = await API.graphql({ query: itemsByType, variables: { nextToken, limit: 10, itemType: "Drawing" }})
+      setDrawings([...drawings, ...apiData.data.itemsByType.items])
+      if (apiData.data.itemsByType.nextToken) {
+        setNextToken(apiData.data.itemsByType.nextToken)
+      } else {
+        setNextToken('')
+      }
+      setLoading(false)
+    } catch (err) {
+      console.log('error fetching drawings...: ', err)
+      setLoading(false)
+    }
+  }
+  
   let history = useHistory();
   function handleClick() {
     if (!inputValue) return
@@ -45,15 +69,33 @@ export default function Drawings() {
       </button>
       <div  style={containerStyle}>
         {
-          drawings.map(drawing => (
-            <h1 key={drawing.id}>
-              <Link to={`/drawing/${drawing.id}/${drawing.name}`} style={drawingNameStyle}>
-                { drawing.name }
-              </Link>
-            </h1>
-          ))
+          drawings.map(drawing => {
+            const drawingData = JSON.parse(drawing.data)
+            const cells = drawingData.list[0].grid
+            return (
+              <h1 key={drawing.id}>
+                <Link to={`/drawing/${drawing.id}/${drawing.name}`} style={drawingNameStyle}>
+                  { drawing.name }
+                </Link>
+                <Link to={`/drawing/${drawing.id}/${drawing.name}`}>
+                  <PixelGrid
+                    cells={List(cells)}
+                    width={drawingData.columns * 10}
+                  />
+                </Link>
+              </h1>
+            )
+          })
         }
       </div>
+      {
+        nextToken && (
+          <button onClick={listMore} style={buttonStyle}>
+            {loading ? "Loading..." : "View More"}
+          </button>
+        )
+      }
+     
     </div>
   );
 }

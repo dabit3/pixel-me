@@ -28,7 +28,7 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispat
       await API.graphql({ query: createDrawing, variables: { input: drawing }})
       toggleOverlay('', false);
       unlockDrawingDispatch();
-      history.push(`/create/${id}`);
+      history.push(`/create/${id}/${drawingName}`);
       console.log('new drawing created...')
     } catch (err) {
       console.log('error...: ', err)

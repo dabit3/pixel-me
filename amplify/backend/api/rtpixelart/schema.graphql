@@ -1,4 +1,6 @@
-type Drawing @model @key(name: "byItemType", fields: ["itemType", "createdAt"], queryField: "itemsByType") {
+type Drawing @model
+@auth(rules: [{allow: public, operations: [create, read, update]}])
+@key(name: "byItemType", fields: ["itemType", "createdAt"], queryField: "itemsByType") {
   id: ID!
   clientId: ID!
   name: String!

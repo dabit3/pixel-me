@@ -90,7 +90,7 @@ class App extends React.Component {
 
   subscribe() {
     const { dispatch } = this.props;
-    const { id, name } = this.props.match.params;
+    const { id } = this.props.match.params;
     this.subscription = API.graphql(graphqlOperation(onUpdateByID, { id }))
     .subscribe({
       next: drawingData =>  {
@@ -139,6 +139,7 @@ class App extends React.Component {
   render() {
     const { helpOn, showCookiesBanner, modalType, modalOpen } = this.state;
     const { isLocked } = this.props
+    const { name } = this.props.match.params;
     return (
       <div
         className="app__main"
@@ -289,6 +290,7 @@ class App extends React.Component {
             </div>
           </div>
           <div className="center col-2-4">
+            <h1 style={{ paddingLeft: 20}}>{name}</h1>
             <PixelCanvasContainer
               drawHandlersFactory={this.drawHandlersFactory}
             />
