@@ -136,7 +136,8 @@ const containerStyle = {
 }
 
 const inputStyle = {
-  padding: '4px 8px'
+  padding: '4px 8px',
+  outline: 'none'
 }
 
 const buttonStyle = {

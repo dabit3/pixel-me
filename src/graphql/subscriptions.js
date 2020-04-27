@@ -11,6 +11,7 @@ export const onCreateDrawing = /* GraphQL */ `
       public
       itemType
       createdAt
+      locked
     }
   }
 `;
@@ -24,6 +25,7 @@ export const onUpdateDrawing = /* GraphQL */ `
       public
       itemType
       createdAt
+      locked
     }
   }
 `;
@@ -37,6 +39,7 @@ export const onDeleteDrawing = /* GraphQL */ `
       public
       itemType
       createdAt
+      locked
     }
   }
 `;

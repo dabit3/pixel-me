@@ -1,5 +1,5 @@
 {
-  "AppSyncApiName": "rtpixelart",
-  "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": "false"
+    "AppSyncApiName": "rtpixelart",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": "false"
 }

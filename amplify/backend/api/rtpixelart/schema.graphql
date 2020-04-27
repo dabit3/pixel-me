@@ -6,4 +6,5 @@ type Drawing @model @key(name: "byItemType", fields: ["itemType", "createdAt"], 
   public: Boolean
   itemType: String
   createdAt: String
+  locked: Boolean
 }

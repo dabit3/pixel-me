@@ -82,10 +82,6 @@
     "uuid": "^7.0.3",
     "whatwg-fetch": "^2.0.4"
   },
-  "engines": {
-    "node": "12.13.1",
-    "npm": "6.12.1"
-  },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",

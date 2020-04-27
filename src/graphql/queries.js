@@ -11,6 +11,7 @@ export const getDrawing = /* GraphQL */ `
       public
       itemType
       createdAt
+      locked
     }
   }
 `;
@@ -29,6 +30,7 @@ export const listDrawings = /* GraphQL */ `
         public
         itemType
         createdAt
+        locked
       }
       nextToken
     }
@@ -59,6 +61,7 @@ export const itemsByType = /* GraphQL */ `
         public
         itemType
         createdAt
+        locked
       }
       nextToken
     }
