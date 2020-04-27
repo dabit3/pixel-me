@@ -2,6 +2,10 @@
 
 This project is based on the wonderful [Pixel art in React](https://github.com/jvalen/pixel-art-react) project by [Javier Valencia](https://github.com/jvalen/pixel-art-react)
 
+With Pixel me, you can create, share, and collaborate on pixel art projects in real-time.
+
+![](demo.gif)
+
 ## This project is built with GraphQL and the [GraphQL Transform](https://docs.amplify.aws/cli/graphql-transformer/overview) library.
 
 There are a few main parts to this back end, but everything starts with the base GraphQL schema:
