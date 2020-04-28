@@ -2,7 +2,7 @@
 
 This project is based on the wonderful [Pixel art in React](https://github.com/jvalen/pixel-art-react) project by [Javier Valencia](https://github.com/jvalen/pixel-art-react) and [AWS Amplify](https://docs.amplify.aws/).
 
-With Pixel me, you can create, share, and collaborate on pixel art projects in real-time.
+With Pixel me, you can create, share, and collaborate on pixel art projects in real-time. You can then export the drawing or animation in either __CSS__, __png__, __GIF__, or __spritesheet__.
 
 ![](demo.gif)
 
