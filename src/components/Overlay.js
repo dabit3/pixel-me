@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux';
-import { duplicateDrawing, lockDrawing, unlockDrawing } from '../store/actions/actionCreators';
+import { duplicateDrawing, lockDrawing, unlockDrawing, setVisibility } from '../store/actions/actionCreators';
 import { useHistory } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { API } from 'aws-amplify'
-import { createDrawing } from '../graphql/mutations'
+import { createDrawing, updateDrawing } from '../graphql/mutations'
 
-function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispatch, clientId, frames }) {
+function Overlay({ drawingId, type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispatch, setVisibilityDispatch, clientId, frames }) {
   let history = useHistory();
   const [drawingVisibility, setDrawingVisibility] = useState('public')
   const [drawingName, updateDrawingName] = useState('') 
@@ -23,7 +23,6 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispat
       data: frameData,
       clientId
     };
-    console.log('drawing: ', drawing)
     try {
       await API.graphql({ query: createDrawing, variables: { input: drawing }})
       toggleOverlay('', false);
@@ -34,11 +33,24 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispat
       console.log('error...: ', err)
     }
   }
+  async function makePublic() {
+    const drawing = {
+      id: drawingId, public: true, itemType: "Drawing"
+    };
+    try {
+      await API.graphql({ query: updateDrawing, variables: { input: drawing }})
+      toggleOverlay('', false);
+      setVisibilityDispatch(true);
+      console.log('drawing now public...')
+    } catch (err) {
+      console.log('error making public...: ', err)
+    }
+  }
   return (
     <div style={dialogStyle(type)}>
       <div style={containerStyle}>
         {
-          type === 'lock' ? (
+          type === 'lock' && (
             <div>
               <p>This drawing will no longer be editable.</p>
                 <button onClick={() => {
@@ -49,32 +61,48 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispat
               </button>
               <p style={cancelButton} onClick={() => toggleOverlay('', false)}>Cancel</p>
             </div>
-          ) : (
+          )
+        }
+        {
+          type === 'duplicate' && (
+            (
+              <div>
+                <input
+                  style={inputStyle}
+                  placeholder="Drawing Name"
+                  onChange={e => updateDrawingName(e.target.value)}
+                />
+                <div style={toggleButtonContainer}>
+                  <button
+                    style={toggleButtonStyle('public', drawingVisibility)}
+                    onClick={() => setDrawingVisibility('public')}
+                  >Public</button>
+                  <button
+                  style={toggleButtonStyle('private', drawingVisibility)}
+                  onClick={() => setDrawingVisibility('private')}
+                  >Private</button>
+                </div>
+                {
+                  drawingVisibility === 'public' ? <p>This drawing will be listed in the main app.</p>
+                  : <p>This drawing will not be listed in the main app.</p>
+                }
+                <button onClick={duplicate} style={buttonStyle}>
+                  Duplicate
+                </button>
+                <p style={cancelButton} onClick={() => toggleOverlay('', false)}>Cancel</p>
+                </div>
+            )
+          )
+        }
+        {
+          type === 'makePublic' && (
             <div>
-              <input
-                style={inputStyle}
-                placeholder="Drawing Name"
-                onChange={e => updateDrawingName(e.target.value)}
-              />
-              <div style={toggleButtonContainer}>
-                <button
-                  style={toggleButtonStyle('public', drawingVisibility)}
-                  onClick={() => setDrawingVisibility('public')}
-                >Public</button>
-                <button
-                style={toggleButtonStyle('private', drawingVisibility)}
-                onClick={() => setDrawingVisibility('private')}
-                >Private</button>
-              </div>
-              {
-                drawingVisibility === 'public' ? <p>This drawing will be listed in the main app.</p>
-                : <p>This drawing will not be listed in the main app.</p>
-              }
-              <button onClick={duplicate} style={buttonStyle}>
-                Duplicate
+              <p>This drawing will now be viewable in the main app.</p>
+                <button onClick={makePublic} style={buttonStyle}>
+                Confirm to make public
               </button>
-              <p style={cancelButton} onClick={() => setModalVisible(false)}>Cancel</p>
-              </div>
+              <p style={cancelButton} onClick={() => toggleOverlay('', false)}>Cancel</p>
+            </div>
           )
         }
       </div>
@@ -85,14 +113,16 @@ function Overlay({ type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispat
 const mapDispatchToProps = dispatch => ({
   duplicateDrawingDispatch: () => dispatch(duplicateDrawing()),
   lockDrawingDispatch: () => dispatch(lockDrawing()),
-  unlockDrawingDispatch: () => dispatch(unlockDrawing())
+  unlockDrawingDispatch: () => dispatch(unlockDrawing()),
+  setVisibilityDispatch: (visibility) => dispatch(setVisibility(visibility))
 });
 
 const mapStateToProps = state => {
   const currentState = state.present.toJS()
   return {
     frames: currentState.frames,
-    clientId: currentState.clientId
+    clientId: currentState.clientId,
+    drawingId: currentState.drawingId
   }
 };
 
@@ -128,11 +158,11 @@ const dialogStyle = (type = 'duplicate') => ({
   zIndex: 100,
   position: 'fixed',
   width: 340,
-  height: type === 'lock' ? 190 : 300,
+  height: type !== 'duplicate' ? 190 : 300,
   left: '50%',
   top: '50%',
   marginLeft: -170,
-  marginTop: type === 'lock' ? -95 : -150,
+  marginTop: type !== 'duplicate' ? -95 : -150,
   backgroundColor: "#ddd",
 })
 

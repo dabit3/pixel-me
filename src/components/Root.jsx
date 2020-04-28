@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import Drawing from './App';
 import Drawings from './Drawings';
@@ -16,7 +16,7 @@ function Router({ store }) {
     <HashRouter>
       <div>
         <header style={{ padding: 0 }}>
-          <div class="col-2-3">
+          <div className="col-2-3">
             <h1>
               <a style={{ color: '#ddd', textDecoration: 'none' }} href="/">PIXEL ME</a>
             </h1>

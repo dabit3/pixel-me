@@ -1,6 +1,13 @@
 import { ActionCreators } from 'redux-undo';
 import * as types from './actionTypes';
 
+export function setVisibility(visibility) {
+  return {
+    type: types.SET_DRAWING_VISIBILITY,
+    visibility
+  }
+}
+
 export function lockDrawing() {
   return {
     type: types.LOCK_DRAWING

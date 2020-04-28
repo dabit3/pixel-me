@@ -16,6 +16,7 @@ import PaletteGridContainer from './PaletteGrid';
 import ResetContainer from './Reset';
 import DuplicateContainer from './Duplicate'
 import LockContainer from './Lock'
+import MakePublic from './MakePublic'
 import SaveDrawingContainer from './SaveDrawing';
 import NewProjectContainer from './NewProject';
 import SimpleNotificationContainer from './SimpleNotification';
@@ -27,7 +28,7 @@ import Overlay from './Overlay'
 import { withRouter } from 'react-router';
 import { createDrawing } from '../graphql/mutations';
 import { onUpdateByID } from '../graphql/subscriptions'
-import { setDrawingId, lockDrawing } from '../store/actions/actionCreators'
+import { setDrawingId, lockDrawing, setVisibility } from '../store/actions/actionCreators'
 import { connect } from 'react-redux';
 
 import { API, graphqlOperation } from 'aws-amplify';
@@ -48,7 +49,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, setVisibilityDispatch } = this.props;
     initialSetup(dispatch);
     this.subscribe()
     const { activeIndex, ...framesToSet } = this.props.frames
@@ -69,17 +70,19 @@ class App extends React.Component {
         query: createDrawing,
         variables: { input: drawing }
       });
-      console.log('item created!');
+      setVisibilityDispatch(isPublic)
     } catch (err) {
       console.log('drawing already created... fetching drawing', err)
       if (err.errors[0] && err.errors[0].errorType && err.errors[0].errorType === "DynamoDB:ConditionalCheckFailedException") {
         const APIData = err.errors[0].data
         const frames = JSON.parse(APIData.data)
         const isLocked = APIData.locked === true
+        const isPublic = APIData.itemType === "Drawing"
         if (isLocked) {
           dispatch(lockDrawing())
         }
         dispatch({ type: "SET_DRAWING_FROM_API", frames: { ...frames, activeIndex: 0 } })
+        setVisibilityDispatch(isPublic)
         window.scrollTo(0, 0);
       }
     }
@@ -139,7 +142,7 @@ class App extends React.Component {
 
   render() {
     const { helpOn, showCookiesBanner, modalType, modalOpen } = this.state;
-    const { isLocked } = this.props
+    const { isLocked, isPublic } = this.props
     const { name } = this.props.match.params;
     return (
       <div
@@ -336,6 +339,15 @@ class App extends React.Component {
                       </div>
                     )
                   }
+                  {
+                    !isPublic && (
+                      <div
+                        data-tooltip={helpOn ? 'Make this drawing public. This will make the drawing show up in the main list of drawings.' : null}
+                      >
+                        <MakePublic toggleOverlay={this.toggleOverlay.bind(this)} />
+                      </div>
+                    )
+                  }
                   <div
                     data-tooltip={helpOn ? 'Number of columns and rows' : null}
                   >
@@ -405,12 +417,18 @@ const mapStateToProps = state => {
   const currentState = state.present.toJS()
   return {
     frames: currentState.frames,
-    isLocked: currentState.isLocked
+    isLocked: currentState.isLocked,
+    isPublic: currentState.isPublic
   }
 };
 
+const mapDispatchToProps = dispatch => ({
+  setVisibilityDispatch: visibility => dispatch(setVisibility(visibility))
+});
+
 const AppContainer = connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(App);
 
 
