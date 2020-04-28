@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import Drawing from './App';
 import Drawings from './Drawings';
-import { HashRouter, Switch, Route } from 'react-router-dom';
+import { HashRouter, Switch, Route, Link } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { setClientId } from '../store/actions/actionCreators' 
 
@@ -18,7 +18,7 @@ function Router({ store }) {
         <header style={{ padding: 0 }}>
           <div className="col-2-3">
             <h1>
-              <a style={{ color: '#ddd', textDecoration: 'none' }} href="/">PIXEL ME</a>
+              <Link style={{ textDecoration: 'none', color: 'black' }} to="/">PIXEL ME</Link>
             </h1>
           </div>
         </header>
