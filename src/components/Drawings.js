@@ -17,7 +17,7 @@ export default function Drawings() {
   }, [])
   async function fetchDrawings() {
     try {
-      const apiData = await API.graphql({ query: itemsByType, variables: { limit: 10, itemType: "Drawing" }})
+      const apiData = await API.graphql({ query: itemsByType, variables: { limit: 5, itemType: "Drawing" }})
       setDrawings(apiData.data.itemsByType.items)
       console.log('apiData:', apiData)
       if (apiData.data.itemsByType.nextToken) {
@@ -30,7 +30,7 @@ export default function Drawings() {
   async function listMore() {
     setLoading(true)
     try {
-      const apiData = await API.graphql({ query: itemsByType, variables: { nextToken, limit: 10, itemType: "Drawing" }})
+      const apiData = await API.graphql({ query: itemsByType, variables: { nextToken, limit: 5, itemType: "Drawing" }})
       setDrawings([...drawings, ...apiData.data.itemsByType.items])
       console.log('apiData: ', apiData)
       if (apiData.data.itemsByType.nextToken) {
