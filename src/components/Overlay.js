@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux';
-import { duplicateDrawing, lockDrawing, unlockDrawing, setVisibility } from '../store/actions/actionCreators';
+import { duplicateDrawing, lockDrawing, unlockDrawing, setVisibility, setDrawingId } from '../store/actions/actionCreators';
 import { useHistory } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { API } from 'aws-amplify'
 import { createDrawing, updateDrawing } from '../graphql/mutations'
 
-function Overlay({ drawingId, type, toggleOverlay, lockDrawingDispatch, unlockDrawingDispatch, setVisibilityDispatch, clientId, frames }) {
+function Overlay({ drawingId, type, setDrawingIdDispatch, toggleOverlay, lockDrawingDispatch, unlockDrawingDispatch, setVisibilityDispatch, clientId, frames }) {
   let history = useHistory();
   const [drawingVisibility, setDrawingVisibility] = useState('public')
   const [drawingName, updateDrawingName] = useState('') 
@@ -27,6 +27,8 @@ function Overlay({ drawingId, type, toggleOverlay, lockDrawingDispatch, unlockDr
       await API.graphql({ query: createDrawing, variables: { input: drawing }})
       toggleOverlay('', false);
       unlockDrawingDispatch();
+      setVisibilityDispatch(isPublic);
+      setDrawingIdDispatch(id);
       history.push(`/create/${id}/${drawingName}`);
       console.log('new drawing created...')
     } catch (err) {
@@ -114,7 +116,8 @@ const mapDispatchToProps = dispatch => ({
   duplicateDrawingDispatch: () => dispatch(duplicateDrawing()),
   lockDrawingDispatch: () => dispatch(lockDrawing()),
   unlockDrawingDispatch: () => dispatch(unlockDrawing()),
-  setVisibilityDispatch: (visibility) => dispatch(setVisibility(visibility))
+  setVisibilityDispatch: (visibility) => dispatch(setVisibility(visibility)),
+  setDrawingIdDispatch: id => dispatch(setDrawingId(id))
 });
 
 const mapStateToProps = state => {
