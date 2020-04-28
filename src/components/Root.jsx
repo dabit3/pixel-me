@@ -18,7 +18,7 @@ function Router({ store }) {
         <header style={{ padding: 0 }}>
           <div className="col-2-3">
             <h1>
-              <Link style={{ textDecoration: 'none', color: 'black' }} to="/">PIXEL ME</Link>
+              <Link style={{ textDecoration: 'none', color: '#ddd' }} to="/">PIXEL ME</Link>
             </h1>
           </div>
         </header>
