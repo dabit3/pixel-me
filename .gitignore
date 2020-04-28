@@ -16,7 +16,14 @@ amplify/.config/local-*
 amplify/mock-data
 amplify/backend/amplify-meta.json
 amplify/backend/awscloudformation
-build/
+build/css/
+build/src/
+build/bundle.js
+build/bundle.js.map
+build/regular-icon.png
+amplify/backend/api/rtpixelart/build/
+build/.DS_Store
+build/apple-touch-icon.png
 dist/
 node_modules/
 aws-exports.js
