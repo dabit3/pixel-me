@@ -37,6 +37,42 @@ You can see there are a couple of things going on her here with directives and a
 - The `@key` directive gives us an easy way to run DynamoDB queries on the `itemType` field. This makes it easy to set custom access patterns on the `itemType` field. For instance, in the main view, we only query for `Public` drawings, but could also set this to anything that we'd like for additional data access patterns.
 - The custom subscription of `onUpdateByID` allows us to create a subscription for individual drawings by `id`
 
-### Deploy this app in your account
+## Deploy this app in your account
+
+### Using the Amplify CLI
+
+1. Clone the project and install the dependencies
+
+```sh
+$ git clone https://github.com/dabit3/pixel-me.git
+$ cd pixel-me
+$ npm install
+```
+
+2. Initialize the Amplify app
+
+```sh
+$ amplify init
+```
+
+3. Deploy the back end
+
+```sh
+$ amplify push
+```
+
+4. Test locally
+
+```sh
+$ npm start
+```
+
+To run a build, run the `build command`
+
+```sh
+$ npm run build
+```
+
+### Using the Amplify Console
 
 [![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://console.aws.amazon.com/amplify/home#/deploy?repo=https://github.com/dabit3/pixel-me)
