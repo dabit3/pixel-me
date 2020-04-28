@@ -28,7 +28,7 @@ import Overlay from './Overlay'
 import { withRouter } from 'react-router';
 import { createDrawing } from '../graphql/mutations';
 import { onUpdateByID } from '../graphql/subscriptions'
-import { setDrawingId, lockDrawing, setVisibility } from '../store/actions/actionCreators'
+import { setDrawingId, lockDrawing, setVisibility, unlockDrawing } from '../store/actions/actionCreators'
 import { connect } from 'react-redux';
 
 import { API, graphqlOperation } from 'aws-amplify';
@@ -51,7 +51,8 @@ class App extends React.Component {
   async componentDidMount() {
     const { dispatch, setVisibilityDispatch } = this.props;
     initialSetup(dispatch);
-    this.subscribe()
+    dispatch(unlockDrawing());
+    this.subscribe();
     const { activeIndex, ...framesToSet } = this.props.frames
     const { id, name, drawingVisibility } = this.props.match.params;
     try {
