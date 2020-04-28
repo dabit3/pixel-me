@@ -1,6 +1,6 @@
 # Pixel me
 
-This project is based on the wonderful [Pixel art in React](https://github.com/jvalen/pixel-art-react) project by [Javier Valencia](https://github.com/jvalen/pixel-art-react)
+This project is based on the wonderful [Pixel art in React](https://github.com/jvalen/pixel-art-react) project by [Javier Valencia](https://github.com/jvalen/pixel-art-react) and [AWS Amplify](https://docs.amplify.aws/).
 
 With Pixel me, you can create, share, and collaborate on pixel art projects in real-time.
 
