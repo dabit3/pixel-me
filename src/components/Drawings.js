@@ -9,9 +9,7 @@ import { List } from 'immutable'
 
 export default function Drawings() {
   const [drawings, setDrawings] = useState([])
-  const [inputValue, updateInputValue] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
-  const [drawingVisibility, setDrawingVisibility] = useState('public')
   const [loading, setLoading] = useState(false)
   const [nextToken, setNextToken] = useState('')
   useEffect(() => {
@@ -48,7 +46,7 @@ export default function Drawings() {
   }
   
   let history = useHistory();
-  function handleClick() {
+  function handleClick(inputValue, drawingVisibility) {
     if (!inputValue) return
     const id = uuid();
     history.push(`/create/${id}/${inputValue}/${drawingVisibility}`);
@@ -58,11 +56,7 @@ export default function Drawings() {
       { modalVisible && (
         <Dialog
           handleClick={handleClick}
-          drawingVisibility={drawingVisibility}
-          setDrawingVisibility={setDrawingVisibility}
           setModalVisible={setModalVisible}
-          inputValue={inputValue}
-          updateInputValue={updateInputValue}
         />
       ) }
       <button onClick={() => setModalVisible(true)} style={buttonStyle}>
@@ -101,7 +95,10 @@ export default function Drawings() {
   );
 }
 
-function Dialog({ updateInputValue, handleClick, drawingVisibility, setDrawingVisibility, setModalVisible }) {
+function Dialog({ handleClick, setModalVisible }) {
+  const [inputValue, updateInputValue] = useState('')
+  const [drawingVisibility, setDrawingVisibility] = useState('public')
+
   const isPublic = drawingVisibility === 'public'
   return (
     <div style={dialogStyle}>
@@ -125,7 +122,7 @@ function Dialog({ updateInputValue, handleClick, drawingVisibility, setDrawingVi
           isPublic ? <p>This drawing will be listed in the main app.</p>
           : <p>This drawing will not be listed in the main app.</p>
         }
-        <button onClick={handleClick} style={buttonStyle}>
+        <button onClick={() => handleClick(inputValue, drawingVisibility)} style={buttonStyle}>
           Create
         </button>
         <p style={cancelButton} onClick={() => setModalVisible(false)}>Cancel</p>
