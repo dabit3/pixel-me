@@ -291,6 +291,7 @@ class App extends React.Component {
           </div>
           <div className="center col-2-4">
             <h1 style={{ paddingLeft: 20}}>{name}</h1>
+            {isLocked && <h2 style={{ paddingLeft: 20}}>This drawing is locked</h2>}
             <PixelCanvasContainer
               drawHandlersFactory={this.drawHandlersFactory}
             />
