@@ -15,6 +15,13 @@ function Router({ store }) {
   return (
     <HashRouter>
       <div>
+        <header style={{ padding: 0 }}>
+          <div class="col-2-3">
+            <h1>
+              <a style={{ color: '#ddd', textDecoration: 'none' }} href="/">PIXEL ME</a>
+            </h1>
+          </div>
+        </header>
         <Switch>
           <Route exact path="/">
             <Drawings store={store} dispatch={store.dispatch} clientId={CLIENT_ID} />

@@ -4,9 +4,9 @@ import PixelCell from './PixelDisplayCell';
 const PixelGrid = ({ cells, width }) => {
   return (
     <div style={pixelGridStyle(width)}>
-      {cells.map(cell => (
+      {cells.map((cell, index) => (
         <PixelCell
-          key={cell.id}
+          key={index}
           cell={cell}
           id={cell.id}
         />

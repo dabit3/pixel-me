@@ -19,7 +19,7 @@ export default function Drawings() {
   }, [])
   async function fetchDrawings() {
     try {
-      const apiData = await API.graphql({ query: itemsByType, variables: { limit: 10, itemType: "Drawing" }})
+      const apiData = await API.graphql({ query: itemsByType, variables: { limit: 10, itemType: "Drawing", sortDirection: "DESC" }})
       setDrawings(apiData.data.itemsByType.items)
       console.log('apiData:', apiData)
       if (apiData.data.itemsByType.nextToken) {

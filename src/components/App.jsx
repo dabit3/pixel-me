@@ -80,6 +80,7 @@ class App extends React.Component {
           dispatch(lockDrawing())
         }
         dispatch({ type: "SET_DRAWING_FROM_API", frames: { ...frames, activeIndex: 0 } })
+        window.scrollTo(0, 0);
       }
     }
   }
