@@ -55,7 +55,7 @@
     "postcss-loader": "^3.0.0",
     "postcss-reporter": "^6.0.1",
     "precss": "^2.0.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "radium": "^0.26.0",
     "react": "^16.8.6",
     "react-addons-pure-render-mixin": "^15.6.2",
